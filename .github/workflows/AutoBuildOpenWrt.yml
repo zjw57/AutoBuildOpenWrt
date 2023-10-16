@@ -58,17 +58,13 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH OpenWrt
         ln -sf /workdir/OpenWrt $GITHUB_WORKSPACE/OpenWrt
 
-    - name: Load Custom Common Configuration
+    - name: Load Custom feeds
       run: |
         cp -rf devices OpenWrt/
         cd OpenWrt
         chmod +x devices/common/$DIY_SH
         /bin/bash "devices/common/$DIY_SH"
-        cp -f devices/common/$CONFIG_FILE .config
-        if [ -f "devices/${{matrix.target}}/$CONFIG_FILE" ]; then
-          echo >> .config
-          cat devices/${{matrix.target}}/$CONFIG_FILE >> .config
-        fi
+        cat feeds.conf.default
 
     - name: Update feeds
       run: cd OpenWrt && ./scripts/feeds update -a
@@ -76,9 +72,14 @@ jobs:
     - name: Install feeds
       run: cd OpenWrt && ./scripts/feeds install -a
 
-    - name: Load Custom ${{matrix.target}} Configuration
+    - name: Load Custom Configuration
       run: |
         cd OpenWrt
+        cp -f devices/common/$CONFIG_FILE .config
+        if [ -f "devices/${{matrix.target}}/$CONFIG_FILE" ]; then
+          echo >> .config
+          cat devices/${{matrix.target}}/$CONFIG_FILE >> .config
+        fi
         if [ -f "devices/${{matrix.target}}/$DIY_SH" ]; then
           chmod +x devices/${{matrix.target}}/$DIY_SH
           echo "/bin/bash devices/${{matrix.target}}/$DIY_SH"
