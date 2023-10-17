@@ -26,7 +26,6 @@ index 78ec7e2e94..8ec32b838a 100644
 +	fi; \
 +	$(OPKG) install --force-overwrite --force-checksum --force-depends $(BUILD_PACKAGES) luci-i18n-base-zh-cn luci-i18n-base-en; \
 +	$(OPKG) install $$packages || true
-+	$(OPKG) install --force-overwrite --force-checksum --force-depends --force-maintainer --force-reinstall luci-app-easymesh
  
  prepare_rootfs: FORCE
  	@echo
