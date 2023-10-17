@@ -1,0 +1,35 @@
+From 62b1ceb3b739dec80c4fc6b86ccbbe34da377469 Mon Sep 17 00:00:00 2001
+From: zjw57 <zjw57@qq.com>
+Date: Tue, 17 Oct 2023 18:11:31 +0800
+Subject: [PATCH] imagebuilder
+
+---
+ target/imagebuilder/files/Makefile | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/target/imagebuilder/files/Makefile b/target/imagebuilder/files/Makefile
+index 78ec7e2e94..8ec32b838a 100644
+--- a/target/imagebuilder/files/Makefile
++++ b/target/imagebuilder/files/Makefile
+@@ -186,7 +186,17 @@ package_install: FORCE
+ 	@echo Installing packages...
+ 	$(OPKG) install $(firstword $(wildcard $(LINUX_DIR)/libc_*.ipk $(PACKAGE_DIR)/libc_*.ipk))
+ 	$(OPKG) install $(firstword $(wildcard $(LINUX_DIR)/kernel_*.ipk $(PACKAGE_DIR)/kernel_*.ipk))
+-	$(OPKG) install $(BUILD_PACKAGES)
++	for p in $(BUILD_PACKAGES); do \
++		if [[ $$p == luci-app-* && "`$(OPKG) list | grep luci-i18n-\`echo $$p | cut -d - -f 3-\`-zh-cn`" ]]; then \
++			packages+="luci-i18n-`echo $$p | cut -d - -f 3-`-zh-cn "; \
++		fi \
++	done; \
++	if [[ "`echo "$(BUILD_PACKAGES)" | grep "usb"`" ]]; then \
++		packages+="automount "; \
++	fi; \
++	$(OPKG) install --force-overwrite --force-checksum --force-depends $(BUILD_PACKAGES) luci-i18n-base-zh-cn luci-i18n-base-en; \
++	$(OPKG) install $$packages || true
++	$(OPKG) install --force-overwrite --force-checksum --force-depends --force-maintainer --force-reinstall luci-app-easymesh
+ 
+ prepare_rootfs: FORCE
+ 	@echo
+-- 
+2.42.0
+

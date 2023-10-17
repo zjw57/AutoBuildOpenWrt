@@ -86,9 +86,13 @@ jobs:
           /bin/bash "devices/${{matrix.target}}/$DIY_SH"
         fi
 
-    - name: Setup Tmate Session
-      uses: mxschmitt/action-tmate@v3
-      if: contains(github.event.action, 'ssh')
+    - name: Apply patches
+      run: |
+        cd OpenWrt
+        git apply devices/common/patches/*.patch
+        if [ -n "$(ls -A devices/${{matrix.target}}/patches 2>/dev/null)" ]; then
+          git apply devices/${{matrix.target}}/patches/*.patch
+        fi
 
     - name: Defconfig
       id: defconfig
@@ -104,6 +108,10 @@ jobs:
         make download -j$(nproc)
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
+
+    - name: Setup Tmate Session
+      uses: mxschmitt/action-tmate@v3
+      if: contains(github.event.action, 'ssh')
 
     - name: Compile the Firmware
       id: compile
