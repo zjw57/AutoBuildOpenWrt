@@ -70,7 +70,7 @@ jobs:
       run: cd OpenWrt && ./scripts/feeds update -a
 
     - name: Install feeds
-      run: cd OpenWrt && ./scripts/feeds install -a -f
+      run: cd OpenWrt && ./scripts/feeds install -a
 
     - name: Load Custom Configuration
       run: |
