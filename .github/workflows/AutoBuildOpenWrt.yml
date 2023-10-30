@@ -121,8 +121,7 @@ jobs:
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "compile_status=success" >> $GITHUB_OUTPUT
         echo "compile_status = ${{ steps.compile.outputs.compile_status }}"
-        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
+        echo "MATRIX_TARGET=${{ matrix.target }}" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
     - name: Check Space Usage
@@ -133,7 +132,7 @@ jobs:
       uses: actions/upload-artifact@main
       if: steps.compile.outputs.compile_status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_bin_${{ env.DEVICE_NAME }}_${{ env.FILE_DATE }}
+        name: OpenWrt_bin_${{ env.MATRIX_TARGET }}_${{ env.FILE_DATE }}
         path: OpenWrt/bin
 
     - name: Organize Files
@@ -150,7 +149,7 @@ jobs:
       uses: actions/upload-artifact@main
       if: steps.organize.outputs.organize_status == 'success' && !cancelled()
       with:
-        name: OpenWrt_firmware_${{ env.DEVICE_NAME }}_${{ env.FILE_DATE }}
+        name: OpenWrt_firmware_${{ env.MATRIX_TARGET }}_${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
     - name: Upload Firmware to Cowtransfer
