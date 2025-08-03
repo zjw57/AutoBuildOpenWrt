@@ -13,3 +13,12 @@ wget -N https://github.com/RPi-Distro/firmware-nonfree/raw/bullseye/debian/confi
 wget -N https://github.com/RPi-Distro/firmware-nonfree/raw/bullseye/debian/config/brcm80211/brcm/brcmfmac43436-sdio.txt -P files/lib/firmware/brcm/
 wget -N https://github.com/RPi-Distro/firmware-nonfree/raw/bullseye/debian/config/brcm80211/brcm/brcmfmac43436s-sdio.bin -P files/lib/firmware/brcm/
 wget -N https://github.com/RPi-Distro/firmware-nonfree/raw/bullseye/debian/config/brcm80211/brcm/brcmfmac43436s-sdio.txt -P files/lib/firmware/brcm/
+
+# Set Rust build arg llvm.download-ci-llvm to false.
+RUST_MAKEFILE="feeds/packages/lang/rust/Makefile"
+if [[ -f "${RUST_MAKEFILE}" ]]; then
+  printf "Modifying %s...\n" "${RUST_MAKEFILE}"
+  sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' "${RUST_MAKEFILE}"
+else
+  echo "File ${RUST_MAKEFILE} does not exist." >&2
+fi
